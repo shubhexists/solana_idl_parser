@@ -6,6 +6,7 @@ use convert_case::{Case, Casing};
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 
+/// Generate all code from an IDL
 pub fn generate_idl_code(idl: &Idl) -> TokenStream {
     let program_name = &idl.metadata.name;
     let program_name_pascal = program_name.to_case(Case::Pascal);
@@ -25,6 +26,7 @@ pub fn generate_idl_code(idl: &Idl) -> TokenStream {
     }
 }
 
+/// Generate discriminator constants
 fn generate_discriminators(instructions: &[IdlInstruction]) -> TokenStream {
     let discriminators = instructions.iter().map(|ix| {
         let name = ix.name.to_case(Case::ScreamingSnake);
@@ -40,6 +42,7 @@ fn generate_discriminators(instructions: &[IdlInstruction]) -> TokenStream {
     quote! { #(#discriminators)* }
 }
 
+/// Generate Accounts struct and Args struct for each instruction
 fn generate_instruction_structs(instructions: &[IdlInstruction]) -> TokenStream {
     let structs = instructions.iter().map(|ix| {
         let name_pascal = ix.name.to_case(Case::Pascal);
@@ -109,6 +112,7 @@ fn generate_instruction_structs(instructions: &[IdlInstruction]) -> TokenStream 
     quote! { #(#structs)* }
 }
 
+/// Generate types from the IDL types section
 fn generate_types(types: &[IdlTypeDef]) -> TokenStream {
     let type_defs = types.iter().map(|typedef| {
         let name = format_ident!("{}", typedef.name);
@@ -164,6 +168,7 @@ fn generate_types(types: &[IdlTypeDef]) -> TokenStream {
     quote! { #(#type_defs)* }
 }
 
+/// Generate an enum variant
 fn generate_enum_variant(variant: &IdlEnumVariant) -> TokenStream {
     let name = format_ident!("{}", variant.name);
 
@@ -184,6 +189,7 @@ fn generate_enum_variant(variant: &IdlEnumVariant) -> TokenStream {
     }
 }
 
+/// Generate the main instructions enum
 fn generate_instructions_enum(
     enum_name: &syn::Ident,
     instructions: &[IdlInstruction],
@@ -223,6 +229,7 @@ fn generate_instructions_enum(
     }
 }
 
+/// Generate the deserialize implementation
 fn generate_deserialize_impl(
     enum_name: &syn::Ident,
     instructions: &[IdlInstruction],
@@ -292,6 +299,7 @@ fn generate_deserialize_impl(
     }
 }
 
+/// Convert IDL type to Rust type tokens
 fn idl_type_to_rust(ty: &IdlType) -> TokenStream {
     match ty {
         IdlType::Primitive(s) => match s.as_str() {

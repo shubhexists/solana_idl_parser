@@ -5,6 +5,28 @@ mod parser;
 use proc_macro::TokenStream;
 use std::path::PathBuf;
 
+/// Parse an Anchor IDL JSON file and generate Rust structs.
+///
+/// This macro reads the IDL file at compile time and generates:
+/// - Discriminator constants for each instruction
+/// - Accounts structs for each instruction (with `from_account_metas` method)
+/// - Args structs for each instruction
+/// - A main enum containing all instructions
+/// - A deserialize implementation for the enum
+/// - Type definitions from the IDL types section
+///
+/// # Arguments
+///
+/// * `path` - Path to the IDL JSON file (relative to the crate root or absolute)
+///
+/// # Example
+///
+/// ```ignore
+/// solana_idl_parser::parse_idl!("idl/pump_amm.json");
+///
+/// // Now you can use the generated types:
+/// let ix = PumpAmmInstructions::deserialize(accounts, &data)?;
+/// ```
 #[proc_macro]
 pub fn parse_idl(input: TokenStream) -> TokenStream {
     let input_str = input.to_string();
